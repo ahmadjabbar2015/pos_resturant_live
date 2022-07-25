@@ -108,11 +108,143 @@ class ReportController extends Controller
         return view('report.profit_loss', compact('business_locations'));
     }
 
+    
+
     /**
      * Shows product report of a business
      *
      * @return \Illuminate\Http\Response
      */
+    public function gettimeReport(Request $request){
+        $business_id = $request->session()->get('user.business_id');
+
+        $business_locations = BusinessLocation::forDropdown($business_id, true);
+        
+        $sell_details = TransactionSellLine::
+        join(
+           
+            'products AS p',
+            'transaction_sell_lines.product_id',
+            '=',
+            'p.id'
+        )
+        ->join(
+            'transactions AS t',
+            'transaction_sell_lines.transaction_id',
+            '=',
+            't.id'
+
+        
+        )
+        ->leftjoin(
+            'types_of_services as ts',
+            't.types_of_service_id',
+            '=',
+            'ts.id'
+        )
+        ->leftjoin(
+            'users as u',
+            't.res_waiter_id',
+            '=',
+            'u.id'
+        )
+        ->leftJoin(
+            'business_locations as bl',
+            't.location_id',
+            '=',
+            'bl.id'
+        )
+        
+        ->select(
+            'p.name as product_name',
+            'p.id as product_id',
+            'p.time as product_time',
+            't.invoice_no as transaction_invoiceno',
+            't.transaction_date as transaction_date',
+            't.res_waiter_id as transaction_waiter',
+            't.location_id as tlocation_id',
+            'transaction_sell_lines.update_time as update_time',
+            'transaction_sell_lines.total_time as cooked_time',
+            'ts.name as name',
+            'u.first_name as fname',
+            'bl.location_id as location_id',
+            
+
+        )
+        ->get();
+        
+            if($request->ajax()){
+                $sell_details = TransactionSellLine::
+        join(
+           
+            'products AS p',
+            'transaction_sell_lines.product_id',
+            '=',
+            'p.id'
+        )
+        ->join(
+            'transactions AS t',
+            'transaction_sell_lines.transaction_id',
+            '=',
+            't.id'
+
+        
+        )
+        ->leftjoin(
+            'types_of_services as ts',
+            't.types_of_service_id',
+            '=',
+            'ts.id'
+        )
+        ->leftjoin(
+            'users as u',
+            't.res_waiter_id',
+            '=',
+            'u.id'
+        )
+        ->leftJoin(
+            'business_locations as bl',
+            't.location_id',
+            '=',
+            'bl.id'
+        )
+        
+        ->select(
+            'p.name as product_name',
+            'p.id as product_id',
+            'p.time as product_time',
+            't.invoice_no as transaction_invoiceno',
+            't.transaction_date as transaction_date',
+            't.res_waiter_id as transaction_waiter',
+            't.location_id as location_id',
+            'transaction_sell_lines.update_time as update_time',
+            'transaction_sell_lines.total_time as cooked_time',
+            'ts.name as name',
+            'u.first_name as fname',
+            'bl.location_id',
+            
+
+        )->where(
+            't.res_waiter_id',
+            '=',
+            $request->location
+        )
+        ->get();
+        
+        return response()->json(['selldetails'=>$sell_details]);
+
+            }
+
+       
+
+        $waiters = $this->transactionUtil->serviceStaffDropdown($business_id);
+    
+    
+
+
+        return view('report.time_report', compact('business_locations','waiters','sell_details'));
+    }
+    
     public function getPurchaseSell(Request $request)
     {
         if (!auth()->user()->can('purchase_n_sell_report.view')) {
@@ -337,6 +469,8 @@ class ReportController extends Controller
             }
 
             $datatable =  Datatables::of($products)
+        
+                            
                 ->editColumn('stock', function ($row) {
                     if ($row->enable_stock) {
                         $stock = $row->stock ? $row->stock : 0 ;
@@ -407,15 +541,25 @@ class ReportController extends Controller
                     $unit_selling_price = (float)$row->group_price > 0 ? $row->group_price : $row->unit_price;
                     $stock_price_by_sp = $stock * $unit_selling_price;
                     $potential_profit = (float)$stock_price_by_sp - (float)$row->stock_price;
+                    // $potential_profit=0;
 
                     return  '<span class="potential_profit" data-orig-value="' . (float)$potential_profit . '" > ' . $this->transactionUtil->num_f($potential_profit, true) . '</span>';
                 })
+                ->addColumn('Enter Current Stock', function ($row) {
+                                        $addstock = '<input type="number"  class="new_stock" id="'.(float)$row->sku .'" value="" data-name="'.(float)$row->sku .'" data-id="'.(float)$row->stock .'" class="form-control" placeholder="Enter Stock">';
+
+                    return  $addstock;
+                    // '<span class="potential_profit" data-orig-value="' . (float)$potential_profit . '" > ' . $this->transactionUtil->num_f($potential_profit, true) . '</span>';
+                })
+                
+            
+
                 ->removeColumn('enable_stock')
                 ->removeColumn('unit')
                 ->removeColumn('id');
 
             $raw_columns  = ['unit_price', 'total_transfered', 'total_sold',
-                    'total_adjusted', 'stock', 'stock_price', 'stock_value_by_sale_price', 'potential_profit'];
+                    'total_adjusted', 'stock', 'stock_price', 'stock_value_by_sale_price', 'potential_profit','Enter Current Stock'];
 
             if ($show_manufacturing_data) {
                 $datatable->editColumn('total_mfg_stock', function ($row) {
@@ -437,6 +581,7 @@ class ReportController extends Controller
         $units = Unit::where('business_id', $business_id)
                             ->pluck('short_name', 'id');
         $business_locations = BusinessLocation::forDropdown($business_id, true);
+
 
         return view('report.stock_report')
             ->with(compact('categories', 'brands', 'units', 'business_locations', 'show_manufacturing_data'));
@@ -2421,6 +2566,7 @@ class ReportController extends Controller
         $business_locations = BusinessLocation::forDropdown($business_id, true);
 
         $waiters = $this->transactionUtil->serviceStaffDropdown($business_id);
+        // dd($business_id);
 
         return view('report.service_staff_report')
             ->with(compact('business_locations', 'waiters'));
@@ -3170,8 +3316,7 @@ class ReportController extends Controller
                     'transaction_sell_lines_purchase_lines.purchase_line_id',
                     'transaction_sell_lines_purchase_lines.qty_returned',
                     'bl.name as location',
-                    'SL.sell_line_note',
-                    'PL.lot_number'
+                    'SL.sell_line_note'
                 );
 
             $permitted_locations = auth()->user()->permitted_locations();
@@ -3627,5 +3772,18 @@ class ReportController extends Controller
         return view('report.activity_log')->with(compact('users', 'transaction_types'));
 
                            
+    }
+
+
+
+    public function stocktotal($stid,$totalstock,$stockqun){
+        $report_stock=$totalstock;
+        $userstock=$stockqun;
+        VariationLocationDetails::where("product_id" ,$stid)->update([
+            "qty_stock_today"=>$report_stock,
+            "user_enter_stock"=>$userstock
+        ]);
+
+        
     }
 }

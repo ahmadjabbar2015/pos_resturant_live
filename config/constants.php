@@ -77,5 +77,9 @@ return [
     'invoice_scheme_separator' => '-',
     'show_payments_recovered_today' => false, //Displays payment recovered today table on dashboard
     'enable_b2b_marketplace' => false,
-    'enable_contact_assign' => false, //Used in add/edit contacts screen
+    'enable_contact_assign' => false,
+    
+    'show_payments_recovered_today' => false, //Displays payment recovered today table on dashboard
+    'enable_b2b_marketplace' => false,
+    'enable_contact_assign' => false, //Used in add/edit contacts screen //Used in add/edit contacts screen
 ];

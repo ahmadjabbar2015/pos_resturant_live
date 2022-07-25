@@ -415,4 +415,6 @@
     var element = $('div.modal-xl');
     __currency_convert_recursively(element);
   });
+  
 </script>
+

@@ -128,7 +128,15 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/sells/convert-to-proforma/{id}', 'SellPosController@convertToProforma');
     Route::get('/sells/quotations', 'SellController@getQuotations');
     Route::get('/sells/draft-dt', 'SellController@getDraftDatables');
+//updatee time
+    Route::get('/time/{last}/{gut}/{value}/{a}', 'SellController@time');
+    Route::get('/serveredtime/{time}/{ge}/{ordercooked}', 'SellController@servedtime');
+    Route::get('/serveredtotaltime/{finaltime}/{gar}/{servedtotal}/{orderserved}', 'SellController@servedtotaltime');
+
+
     Route::resource('sells', 'SellController')->except(['show']);
+    Route::get('kitchentime','SellController@kitchenperformance');
+
 
     Route::get('/import-sales', 'ImportSalesController@index');
     Route::post('/import-sales/preview', 'ImportSalesController@preview');
@@ -144,6 +152,12 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/reset-mapping', 'SellController@resetMapping');
 
     Route::resource('pos', 'SellPosController');
+    Route::get('/notif', 'SellPosController@notif');
+
+    Route::get('/kot/{id}', 'IdController@kot');
+    Route::get('/sellpos', 'IdController@index');
+    Route::get('/bill/{id}', 'IdController@bill');
+
 
     Route::resource('roles', 'RoleController');
 
@@ -167,6 +181,12 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
     Route::get('/reports/get-stock-by-sell-price', 'ReportController@getStockBySellingPrice');
     Route::get('/reports/purchase-report', 'ReportController@purchaseReport');
     Route::get('/reports/sale-report', 'ReportController@saleReport');
+//time report
+Route::get('/reports/Kitchen-Performance', 'ReportController@gettimeReport');
+
+
+//stock report
+Route::get('/stocktotal/{stid}/{totalstock}/{stockqun}','ReportController@stocktotal');
     Route::get('/reports/service-staff-report', 'ReportController@getServiceStaffReport');
     Route::get('/reports/service-staff-line-orders', 'ReportController@serviceStaffLineOrders');
     Route::get('/reports/table-report', 'ReportController@getTableReport');
@@ -338,8 +358,10 @@ Route::middleware(['setData', 'auth', 'SetSessionData', 'language', 'timezone', 
         Route::get('/product-modifiers/product-row/{product_id}', 'Restaurant\ProductModifierSetController@product_row');
 
         Route::get('/add-selected-modifiers', 'Restaurant\ProductModifierSetController@add_selected_modifiers');
-
+//kitchen module
         Route::get('/kitchen', 'Restaurant\KitchenController@index');
+        Route::get('/kitchen/time', 'Restaurant\KitchenController@time');
+
         Route::get('/kitchen/mark-as-cooked/{id}', 'Restaurant\KitchenController@markAsCooked');
         Route::post('/refresh-orders-list', 'Restaurant\KitchenController@refreshOrdersList');
         Route::post('/refresh-line-orders-list', 'Restaurant\KitchenController@refreshLineOrdersList');

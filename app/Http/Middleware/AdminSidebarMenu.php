@@ -475,6 +475,15 @@ class AdminSidebarMenu
                                 ['icon' => 'fa fas fa-file-invoice-dollar', 'active' => request()->segment(2) == 'profit-loss']
                             );
                         }
+                        //time report Kitchen Performance
+                        if (auth()->user()->can('time_report.view')) {
+                            $sub->url(
+                                action('ReportController@gettimeReport'),
+                                __('Kitchen Performance'),
+                                ['icon' => 'fa fas fa-file-invoice-dollar', 'active' => request()->segment(2) == 'Kitchen-Performance']
+                            );
+                        }
+                        
                         if (config('constants.show_report_606') == true) {
                             $sub->url(
                                 action('ReportController@purchaseReport'),
@@ -629,6 +638,7 @@ class AdminSidebarMenu
                                 ['icon' => 'fa fas fa-user-secret', 'active' => request()->segment(2) == 'activity-log']
                             );
                         }
+                        
                     },
                     ['icon' => 'fa fas fa-chart-bar', 'id' => 'tour_step8']
                 )->order(55);

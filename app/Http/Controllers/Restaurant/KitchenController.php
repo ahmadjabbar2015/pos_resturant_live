@@ -47,9 +47,10 @@ class KitchenController extends Controller
 
         $business_id = request()->session()->get('user.business_id');
         $orders = $this->restUtil->getAllOrders($business_id, ['line_order_status' => 'received']);
-
+        
         return view('restaurant.kitchen.index', compact('orders'));
     }
+    
 
     /**
      * Marks an order as cooked
@@ -69,7 +70,8 @@ class KitchenController extends Controller
                             $q->whereNull('res_line_order_status')
                                 ->orWhere('res_line_order_status', 'received');
                         })
-                        ->update(['res_line_order_status' => 'cooked']);
+                        ->update(['res_line_order_status' => 'cooked',
+                                            'update_cooked_status' =>'1']);
 
             $output = ['success' => 1,
                             'msg' => trans("restaurant.order_successfully_marked_cooked")
@@ -83,6 +85,7 @@ class KitchenController extends Controller
         }
 
         return $output;
+        // dd($output);
     }
 
     /**

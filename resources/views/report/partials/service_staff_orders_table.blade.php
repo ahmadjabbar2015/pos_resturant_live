@@ -6,6 +6,11 @@
 	            <th>@lang('sale.invoice_no')</th>
 	            <th>@lang('restaurant.service_staff')</th>
 	            <th>@lang('sale.location')</th>
+				<th>@lang('Cooked at')</th>
+				<th>@lang('Served at')</th>
+				<th>@lang('Total Time')</th>
+
+
 	            <th>@lang('sale.subtotal')</th>
 	            <th>@lang('lang_v1.total_discount')</th>
 	            <th>@lang('lang_v1.total_tax')</th>
@@ -14,7 +19,7 @@
 	    </thead>
 	    <tfoot>
 	        <tr class="bg-gray font-17 footer-total text-center">
-	            <td colspan="4"><strong>@lang('sale.total'):</strong></td>
+	            <td colspan="7"><strong>@lang('sale.total'):</strong></td>
 	            <td><span class="display_currency" id="footer_subtotal" data-currency_symbol ="true"></span></td>
 	            <td><span class="display_currency" id="footer_total_discount" data-currency_symbol ="true"></span></td>
 	            <td><span class="display_currency" id="footer_total_tax" data-currency_symbol ="true"></span></td>

@@ -1,4 +1,13 @@
 <!-- default value -->
+<style>
+ 
+  #view_suspended_sales.blink{
+   color:transparent;
+   transition: color 400ms ease;
+
+   }
+</style>
+
 @php
     $go_back_url = action('SellPosController@index');
     $transaction_sub_type = '';
@@ -40,7 +49,6 @@
               {{$default_location->name}}
             @endif
           @endif
-
           @if(!empty($transaction->location_id)) {{$transaction->location->name}} @endif &nbsp; <span class="curr_datetime">{{ @format_datetime('now') }}</span> <i class="fa fa-keyboard hover-q text-muted" aria-hidden="true" data-container="body" data-toggle="popover" data-placement="bottom" data-content="@include('sale_pos.partials.keyboard_shortcuts_details')" data-html="true" data-trigger="hover" data-original-title="" title=""></i>
         </p>
       </div>
@@ -70,11 +78,44 @@
       <button type="button" title="{{ __('lang_v1.full_screen') }}" class="btn btn-primary btn-flat m-6 hidden-xs btn-xs m-5 pull-right" id="full_screen">
             <strong><i class="fa fa-window-maximize fa-lg"></i></strong>
       </button>
-
-      <button type="button" id="view_suspended_sales" title="{{ __('lang_v1.view_suspended_sales') }}" class="btn bg-yellow btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-container=".view_modal" 
-          data-href="{{$view_suspended_sell_url}}">
-            <strong><i class="fa fa-pause-circle fa-lg"></i></strong>
+  
+   <?php
+  
+  foreach ($trans as $key => $items) {
+      $data4 = $items->update_cooked_status;
+  
+      $notification = explode(",",$data4);
+  }
+  if (isset($notification)) {
+  
+  
+      $data5 ="1";
+      if (in_array($data5,$notification)) {
+       
+  ?>
+      <button id="view_suspended_sales" onclick="not()" title="{{ __('lang_v1.view_suspended_sales') }}" class="btn bg-yellow btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-container=".view_modal" 
+      data-href="{{$view_suspended_sell_url}}"> 
+        <strong class="blink">
+          <i class="fa fa-pause-circle fa-lg"></i>
+        </strong>
       </button>
+       <?php
+      }
+  }else {
+    ?>
+    <button id="view_suspended_sales"  title="{{ __('lang_v1.view_suspended_sales') }}" class="btn bg-yellow btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-container=".view_modal" 
+    data-href="{{$view_suspended_sell_url}}"> 
+      <strong class="">
+        <i class="fa fa-pause-circle fa-lg"></i>
+      </strong>
+    </button>
+    <?php
+    
+  }
+
+  ?> 
+ 
+      
       @if(empty($pos_settings['hide_product_suggestion']) && isMobile())
         <button type="button" title="{{ __('lang_v1.view_products') }}"   
           data-placement="bottom" class="btn btn-success btn-flat m-6 btn-xs m-5 btn-modal pull-right" data-toggle="modal" data-target="#mobile_product_suggestion_modal">
@@ -104,3 +145,25 @@
     
   </div>
 </div>
+<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
+<script>
+
+$(document).ready(function(){
+
+function blink_text() {
+    $('.blink').fadeOut(500);
+    $('.blink').fadeIn(500);
+}
+setInterval(blink_text,1000);
+});
+function not() {
+  $.ajax({
+      type: "get",
+     url:  '/notif' ,
+     success:function(data){
+
+      }
+
+    })
+}
+</script>

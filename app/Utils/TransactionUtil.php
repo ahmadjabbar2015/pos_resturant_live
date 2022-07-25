@@ -4776,6 +4776,13 @@ class TransactionUtil extends Util
                     'transactions.type',
                     'transactions.is_direct_sale',
                     'transactions.invoice_no',
+                    
+                    'transactions.served_time',
+                    'transactions.served_total_time',
+                    'transactions.total_time',
+                    'transactions.order_status_served',
+                    'transactions.order_status_cooked',
+
                     'transactions.invoice_no as invoice_no_text',
                     'contacts.name',
                     'contacts.mobile',

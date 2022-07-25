@@ -17,9 +17,10 @@
 				</div>
 			</div>
 			<div class="modal-footer">
-				<button type="button" class="btn btn-primary" id="pos-suspend">@lang('messages.save')</button>
+				<button type="button" class="btn btn-primary"  onclick="setInterval()"id="pos-suspend">@lang('messages.save')</button>
 			    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('messages.close')</button>
 			</div>
 		</div><!-- /.modal-content -->
 	</div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
+

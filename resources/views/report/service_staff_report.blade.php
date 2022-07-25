@@ -109,12 +109,18 @@
                     d.end_date = end;
                     d.res_waiter_id = $('select#service_staff_id').val();
                 }
+
             },
+            // alert(d);
             columns: [
                 { data: 'transaction_date', name: 'transaction_date'  },
                 { data: 'invoice_no', name: 'invoice_no'},
                 { data: 'waiter', name: 'ss.first_name'},
                 { data: 'business_location', name: 'bl.name'},
+                { data: 'served_time', name: 'transactions.served_time'},
+                { data: 'served_total_time', name: 'transactions.served_total_time'},
+                { data: 'total_time', name: 'transactions.total_time'},
+
                 { data: 'total_before_tax', name: 'transactions.total_before_tax'},
                 { data: 'discount_amount', name: 'transactions.discount_amount'},
                 { data: 'tax_amount', name: 'transactions.tax_amount'},

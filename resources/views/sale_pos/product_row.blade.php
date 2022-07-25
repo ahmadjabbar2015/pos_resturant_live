@@ -2,7 +2,6 @@
 	$common_settings = session()->get('business.common_settings');
 	$multiplier = 1;
 @endphp
-
 @foreach($sub_units as $key => $value)
 	@if(!empty($product->sub_unit_id) && $product->sub_unit_id == $key)
 		@php
@@ -233,10 +232,19 @@
 			@endif
 			data-rule-required="true" 
 			data-msg-required="@lang('validation.custom-messages.this_field_is_required')" 
-			@if($product->enable_stock && empty($pos_settings['allow_overselling']) && empty($is_sales_order) )
-				data-rule-max-value="{{$max_qty_rule}}" data-qty_available="{{$product->qty_available}}" data-msg-max-value="{{$max_qty_msg}}" 
+			
+	
+			@if($checkcount > 0  )
+			 data-qty_available="{{$product->qty_available}}"
+				
 				data-msg_max_default="@lang('validation.custom-messages.quantity_not_available', ['qty'=> $product->formatted_qty_available, 'unit' => $product->unit  ])" 
-			@endif 
+			
+
+			@elseif($product->enable_stock && empty($pos_settings['allow_overselling']) && empty($is_sales_order) )
+				data-rule-max-value="{{$max_qty_rule}}" data-qty_available="{{$product->qty_available}}"
+				 data-msg-max-value="{{$max_qty_msg}}" 
+				data-msg_max_default="@lang('validation.custom-messages.quantity_not_available', ['qty'=> $product->formatted_qty_available, 'unit' => $product->unit  ])" 
+			@endif
 		>
 		<span class="input-group-btn"><button type="button" class="btn btn-default btn-flat quantity-up"><i class="fa fa-plus text-success"></i></button></span>
 		</div>
@@ -333,6 +341,10 @@
 		</td>
 
 	@else
+		@if(!empty($warranties))
+			{!! Form::select("products[$row_count][warranty_id]", $warranties, $warranty_id, ['placeholder' => __('messages.please_select'), 'class' => 'form-control']); !!}
+		@endif
+
 		@if(!empty($pos_settings['inline_service_staff']))
 			<td>
 				<div class="form-group">

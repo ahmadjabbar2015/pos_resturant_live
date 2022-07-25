@@ -1,3 +1,5 @@
+<div class="countdown"></div>
+
 <table class="table bg-gray">
         <tr class="bg-green">
         <th>#</th>
@@ -18,11 +20,18 @@
         <th>{{ __('sale.discount') }}</th>
         <th>{{ __('sale.tax') }}</th>
         <th>{{ __('sale.price_inc_tax') }}</th>
+        <th>Cooked time</th>
         <th>{{ __('sale.subtotal') }}</th>
+        <th>Action</th>
+        <th>Complete</th>
+        {{-- <th>update time</th> --}}
     </tr>
     @foreach($sell->sell_lines as $sell_line)
-        <tr>
-            <td>{{ $loop->iteration }}</td>
+    <?php
+    // dd($sell_line->update_time );
+    ?>
+        <tr data-id="{{$loop->iteration}}">
+            <td >{{ $loop->iteration }}</td>
             <td>
                 {{ $sell_line->product->name }}
                 @if( $sell_line->product->type == 'variable')
@@ -84,9 +93,35 @@
             <td>
                 <span class="display_currency" data-currency_symbol="true">{{ $sell_line->unit_price_inc_tax }}</span>
             </td>
+            {{-- timer add --}}
+            <td >
+                <span  class="countdown"  id="demo">
+                <?php
+                     
+                if($sell_line->update_status!=0){
+                       echo $sell_line->update_time;
+                }else{
+                   echo  $sell_line->product->time;
+                }
+                    ?>
+                </span>
+            </td>
             <td>
                 <span class="display_currency" data-currency_symbol="true">{{ $sell_line->quantity * $sell_line->unit_price_inc_tax }}</span>
             </td>
+            <td>
+                <span><button  id="cookeed"  data-id=" {{$loop->iteration }}" >Start Cooking</button></span>
+            </td>
+            <td>
+                <input type="checkbox"   id="checked" name="checked" value="{{ $sell_line->product->id}}" data-id=" {{$loop->iteration }}" data-name="{{$sell_line->transaction_id}}" data-time="{{$sell_line->product->time}}" >
+                        <label for="checked"> Cooked</label>
+            </td>
+            {{-- <td>
+                <span>
+                    {{$sell_line->product->update_time}}
+ 
+                </span>
+            </td> --}}
         </tr>
         @if(!empty($sell_line->modifiers))
         @foreach($sell_line->modifiers as $modifier)
@@ -123,8 +158,117 @@
                 <td>
                     <span class="display_currency" data-currency_symbol="true">{{ $modifier->quantity * $modifier->unit_price_inc_tax }}</span>
                 </td>
+                
             </tr>
+            
+
             @endforeach
         @endif
     @endforeach
 </table>
+<script>
+
+// time java script
+$(document).ready(function(){
+
+    $(document).on('click','#cookeed',function(){
+        var ge=$(this).attr('data-id');
+        ge = parseInt(ge);
+     
+        var trtag=$(this).closest('tr');
+        
+        var table=trtag.find('#demo').text();
+        var arr=table.split(":");
+        var hours=arr[0];
+        var minutes=arr[1];
+        var seconds=arr[2];
+
+var convertminutes=minutes*60;
+var convertsec=seconds*1;
+var time=convertminutes+convertsec;
+
+
+       var mytimer =     setInterval(function (){
+                                    const h=Math.floor(time/3600);
+                                    const min= Math.floor(time/60);
+                                    const s=Math.floor(time%60);
+                                    
+                                    // if(counter>=0){
+                                        time--;
+
+                                        var a= document.getElementsByClassName("countdown")[ge]
+                                        
+                                       a.innerHTML=`${h} : ${min} : ${s}`;
+                                    
+
+                                        
+                                    // }
+                                     $(document).on('click','#checked',function(){
+                            var get=$(this).attr('data-id');
+                            get= parseInt(get);
+
+                            var gut=$(this).attr('data-name');
+                            var value=$(this).val();
+                            var firsttime=$(this).attr('data-time');
+                            var arrr=firsttime.split(":");
+                            var hours=arrr[0];
+                            var minutes=arrr[1];
+                            var seconds=arrr[2];
+                            
+                            var convertminutes=minutes*60;
+                            // alert(convertminutes)
+                            var convertsec=seconds*1;
+                            var timetaken=convertminutes+convertsec;
+                            
+                          
+                            
+                            var lasttr=$(this).closest('tr');
+                            var last=lasttr.find('#demo').text()
+                            var last1=lasttr.find('#demo').text()
+                                console.log(timetaken);
+                                console.log(time)
+                                var totaltime=(timetaken-time);
+                                console.log(totaltime);
+                                const ho=Math.floor(totaltime/3600);
+                                    const mi= Math.floor(totaltime/60);
+                                    const ss=Math.floor(totaltime%60);
+                                    a=`${ho} : ${mi} : ${ss}`;
+                              console.log(a); 
+                            
+                                
+                            if (get==ge) 
+                            {
+                            clearInterval(mytimer);
+                            
+
+
+                            }
+
+                            $.ajax({
+                                type: "get",
+                                url:  '/time/'+ last + '/' + gut + '/'+value+'/'+a ,
+                               success:function(data){
+
+                               }
+
+                            })
+                            
+
+                        }); 
+                                    
+                        },1000);
+                      
+                        
+                        
+        
+    });
+    
+  
+})
+
+
+</script>
+
+   
+       
+

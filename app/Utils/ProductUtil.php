@@ -20,6 +20,7 @@ use App\VariationGroupPrice;
 use App\VariationLocationDetails;
 use App\VariationTemplate;
 use App\VariationValueTemplate;
+
 use Illuminate\Support\Facades\DB;
 
 class ProductUtil extends Util
@@ -418,6 +419,68 @@ class ProductUtil extends Util
 
         return true;
     }
+    public function productionquantity($product,$intergirdent,$data,$mfg,$locationid)
+    {        
+        
+        
+        $alll=DB::table('mfg_recipes')->where('variation_id',$product['variation_id'])->first();
+        
+        $qan=$product['quantity'];
+        
+        foreach ($mfg as  $value) {
+    
+                            $qant_upadtae=$value->quantity * $qan;
+                            
+                        $old_quan=DB::table('variation_location_details')->where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                            ->first();
+                            
+                            
+                                $old_respie_material=$old_quan->qty_available;
+                            
+                            if ($value->sub_unit_id == null) {
+                                
+                                        $new_qaty=$old_respie_material-$qant_upadtae;
+                                    
+                                        VariationLocationDetails::where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                                ->update([
+                                    'qty_available' => $new_qaty
+                                    ]);
+                                    
+                            }else{
+                                            $data=  DB::table('units')->where('id',$value->sub_unit_id)->first();
+                                    $converter=$data->base_unit_multiplier;
+                                    
+                                    //    $total=$qant_upadtae / $converter;
+                                        
+                                        $newqan=$qant_upadtae * $converter;
+                                        
+                                            
+                                            $new_qaty=$old_respie_material - $newqan;
+                                            VariationLocationDetails::where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                                    ->update([
+                                        'qty_available' => $new_qaty
+                                        ]);
+
+                            }
+                        
+
+                    }
+
+
+            
+            
+
+        
+        
+        
+        
+}
+
+       
+        
+        
+
+    
 
     /**
      * Decrease the product quantity of combo sub-products
@@ -427,18 +490,62 @@ class ProductUtil extends Util
      *
      * @return void
      */
-    public function decreaseProductQuantityCombo($combo_details, $location_id)
+    public function decreaseProductQuantityCombo($combo_details, $location_id,$mfg,$intergirdent,$locationid,$varid,$qut)
     {
+    
         //product_id = child product id
         //variation id is child product variation id
-        foreach ($combo_details as $details) {
-            $this->decreaseProductQuantity(
-                $details['product_id'],
-                $details['variation_id'],
-                $location_id,
-                $details['quantity']
-            );
+        // foreach ($combo_details as $details) {
+        //     $this->decreaseProductQuantity(
+        //         $details['product_id'],
+        //         $details['variation_id'],
+        //         $location_id,
+        //         $details['quantity']
+        //     );
+        // }
+        // dd("haha");
+        $alll=DB::table('mfg_recipes')->where('variation_id',$varid)->first();
+        
+        $qan=$qut;
+        
+        foreach ($intergirdent as  $value) {
+            // dd($value);
+                    
+                    $qant_upadtae=$value->quantity * $qan;
+                    
+                $old_quan=DB::table('variation_location_details')->where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                    ->first();
+                    
+                    
+                        $old_respie_material=$old_quan->qty_available;
+                        
+            if ($value->sub_unit_id == null) {
+                            
+                            $new_qaty=$old_respie_material-$qant_upadtae;
+                        
+                            VariationLocationDetails::where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                    ->update([
+                        'qty_available' => $new_qaty
+                        ]);
+                        
+            }else{
+                            $data=  DB::table('units')->where('id',$value->sub_unit_id)->first();
+                        $converter=$data->base_unit_multiplier;
+                    
+                        //    $total=$qant_upadtae / $converter;
+                        
+                        $newqan=$qant_upadtae * $converter;
+                        
+                            
+                            $new_qaty=$old_respie_material - $newqan;
+                            VariationLocationDetails::where('variation_id', $value->variation_id)->where('location_id',$locationid)
+                        ->update([
+                        'qty_available' => $new_qaty
+                        ]);
+
+                    }
         }
+    
     }
 
     /**
@@ -463,6 +570,7 @@ class ProductUtil extends Util
                 })
                 ->where('p.business_id', $business_id)
                 ->where('variations.id', $variation_id);
+                
 
         //Add condition for check of quantity. (if stock is not enabled or qty_available > 0)
         if ($check_qty) {
@@ -1783,7 +1891,9 @@ class ProductUtil extends Util
                   WHERE (transactions.status='received' OR transactions.type='purchase_return')  AND transactions.location_id=vld.location_id 
                   AND (pl.variation_id=variations.id)) as stock_price"),
             DB::raw("SUM(vld.qty_available) as stock"),
-            'variations.sub_sku as sku',
+            'vld.user_enter_stock as usstock',
+            'vld.qty_stock_today as todaystock',
+             'variations.sub_sku as sku',
             'p.name as product',
             'p.type',
             'p.id as product_id',

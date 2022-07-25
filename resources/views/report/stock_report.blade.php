@@ -87,6 +87,8 @@
         <div class="col-md-12">
             @component('components.widget', ['class' => 'box-solid'])
                 @include('report.partials.stock_report_table')
+                {{-- @include('report.partials.stock_report_table2') --}}
+
             @endcomponent
         </div>
     </div>

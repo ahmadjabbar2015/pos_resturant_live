@@ -121,7 +121,7 @@
                     </div>
                     @can('stock_report.view')
                     <div class="tab-pane" id="product_stock_report">
-                        @include('report.partials.stock_report_table')
+                        @include('report.partials.stock_report_table2')
                     </div>
                     @endcan
                 </div>
@@ -468,13 +468,16 @@
         $('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
             if ($(e.target).attr('href') == '#product_stock_report') {
                 if (!data_table_initailized) {
-                    //Stock report table
+//Stock report table
                     var stock_report_cols = [
                         { data: 'sku', name: 'variations.sub_sku' },
                         { data: 'product', name: 'p.name' },
                         { data: 'location_name', name: 'l.name' },
                         { data: 'unit_price', name: 'variations.sell_price_inc_tax' },
                         { data: 'stock', name: 'stock', searchable: false },
+                        { data: 'usstock', name: 'stock', searchable: false },
+                        { data: 'todaystock', name: 'stock', searchable: false },
+
                         @can('view_product_stock_value')
                         { data: 'stock_price', name: 'stock_price', searchable: false },
                         { data: 'stock_value_by_sale_price', name: 'stock_value_by_sale_price', searchable: false, orderable: false },

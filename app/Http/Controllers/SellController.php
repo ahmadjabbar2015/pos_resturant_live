@@ -293,6 +293,7 @@ class SellController extends Controller
             }
 
             $sells->groupBy('transactions.id');
+            
 
             if (!empty(request()->suspended)) {
                 $transaction_sub_type = request()->get('transaction_sub_type');
@@ -314,10 +315,16 @@ class SellController extends Controller
 
                 $sales = $sells->where('transactions.is_suspend', 1)
                             ->with($with)
-                            ->addSelect('transactions.is_suspend', 'transactions.res_table_id', 'transactions.res_waiter_id', 'transactions.additional_notes')
+                            ->addSelect('transactions.is_suspend', 'transactions.id','transactions.res_table_id', 'transactions.res_waiter_id', 'transactions.additional_notes')
                             ->get();
 
-                return view('sale_pos.partials.suspended_sales_modal')->with(compact('sales', 'is_tables_enabled', 'is_service_staff_enabled', 'transaction_sub_type'));
+                    $trans=TransactionSellLine::where('update_cooked_status',1)
+                    ->get();
+                  
+
+
+
+                return view('sale_pos.partials.suspended_sales_modal')->with(compact('sales', 'is_tables_enabled', 'is_service_staff_enabled', 'transaction_sub_type','trans'));
             }
 
             $with[] = 'payment_lines';
@@ -611,6 +618,10 @@ class SellController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+    
+
+
+
     public function create()
     {
         $sale_type = request()->get('sale_type', '');
@@ -720,9 +731,9 @@ class SellController extends Controller
             }
         }
 
-        //Added check because $users is of no use if enable_contact_assign if false
-        $users = config('constants.enable_contact_assign') ? User::forDropdown($business_id, false, false, false, true) : [];
-
+    
+    //Added check because $users is of no use if enable_contact_assign if false	
+    $users = config('constants.enable_contact_assign') ? User::forDropdown($business_id, false, false, false, true) : [];	
         return view('sell.create')
             ->with(compact(
                 'business_details',
@@ -789,6 +800,7 @@ class SellController extends Controller
         }
 
         $sell = $query->firstOrFail();
+        
 
         $activities = Activity::forSubject($sell)
            ->with(['causer', 'subject'])
@@ -1149,11 +1161,11 @@ class SellController extends Controller
 
         $customer_due = $customer_due != 0 ? $this->transactionUtil->num_f($customer_due, true) : '';
 
-        //Added check because $users is of no use if enable_contact_assign if false
+        	
+        //Added check because $users is of no use if enable_contact_assign if false	
         $users = config('constants.enable_contact_assign') ? User::forDropdown($business_id, false, false, false, true) : [];
-
         return view('sell.edit')
-            ->with(compact('business_details', 'taxes', 'sell_details', 'transaction', 'commission_agent', 'types', 'customer_groups', 'pos_settings', 'waiters', 'invoice_schemes', 'default_invoice_schemes', 'redeem_details', 'edit_discount', 'edit_price', 'shipping_statuses', 'warranties', 'statuses', 'sales_orders', 'payment_types', 'accounts', 'payment_lines', 'change_return', 'is_order_request_enabled', 'customer_due', 'users'));
+            ->with(compact('business_details', 'taxes', 'sell_details', 'transaction', 'commission_agent', 'types', 'customer_groups', 'pos_settings', 'waiters', 'invoice_schemes', 'default_invoice_schemes', 'redeem_details', 'edit_discount', 'edit_price', 'shipping_statuses', 'warranties', 'statuses', 'sales_orders', 'payment_types', 'accounts', 'payment_lines', 'change_return', 'is_order_request_enabled', 'customer_due','users'));
     }
 
     /**
@@ -1640,4 +1652,49 @@ class SellController extends Controller
 
         echo "Mapping reset success";exit;
     }
-}
+
+
+    public function time($last,$gut,$value,$a){
+        // dd($a);
+          $update_time = $last;
+          $update_status = 1 ;
+          TransactionSellLine::where("transaction_id",$gut )->where("product_id",$value)->update([
+            "update_time" =>$update_time,
+            "update_status" =>$update_status,
+            "total_time" =>$a 
+
+        ]);
+        
+
+    }
+    public function servedtime($time,$ge,$ordercooked){
+        $served_time=$time;
+        $served=$ordercooked;
+        Transaction::where("invoice_no",$ge)->update([
+            "served_time"=>$served_time,
+            "order_status_cooked"=>$served,
+        ]);
+
+        
+    }
+
+    public function servedtotaltime($finaltime,$gar,$servedtotal,$orderserved){
+        $served_total_time=$finaltime;
+        $total_time=$servedtotal;
+        $order_served=$orderserved;
+        Transaction::where("invoice_no",$gar)->update([
+            "served_total_time"=>$served_total_time,
+            "total_time"=>$total_time,
+            "order_status_served"=>$order_served,
+        ]);
+
+        
+    }
+
+    public function kitchenperformance(){
+        // return response('Hello World'); 
+       
+    //    return view('report.time_report')->with(compact('sell_details'));       
+
+    }
+}    

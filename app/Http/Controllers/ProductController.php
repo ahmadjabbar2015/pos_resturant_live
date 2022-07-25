@@ -430,7 +430,7 @@ class ProductController extends Controller
 
         try {
             $business_id = $request->session()->get('user.business_id');
-            $form_fields = ['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'type', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids'];
+            $form_fields = ['name', 'brand_id', 'unit_id', 'time','update_time','update_status','category_id', 'tax', 'type', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids'];
 
             $module_form_fields = $this->moduleUtil->getModuleFormField('product_form_fields');
             if (!empty($module_form_fields)) {
@@ -450,6 +450,16 @@ class ProductController extends Controller
 
             if (empty($product_details['sku'])) {
                 $product_details['sku'] = ' ';
+            }
+
+            if (empty($product_details['time'])) {
+                $product_details['time'] = ' ';
+            }
+            if (empty($product_details['update_time'])) {
+                $product_details['update_time'] = ' ';
+            }
+            if (empty($product_details['update_status'])) {
+                $product_details['update_status'] = ' ';
             }
 
             if (!empty($product_details['alert_quantity'])) {
@@ -655,7 +665,7 @@ class ProductController extends Controller
 
         try {
             $business_id = $request->session()->get('user.business_id');
-            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids']);
+            $product_details = $request->only(['name', 'brand_id', 'unit_id', 'category_id', 'tax', 'barcode_type', 'sku', 'alert_quantity', 'tax_type', 'weight', 'product_custom_field1', 'product_custom_field2', 'product_custom_field3', 'product_custom_field4', 'product_description', 'sub_unit_ids','time']);
 
             DB::beginTransaction();
             
@@ -686,6 +696,7 @@ class ProductController extends Controller
             $product->product_custom_field3 = $product_details['product_custom_field3'];
             $product->product_custom_field4 = $product_details['product_custom_field4'];
             $product->product_description = $product_details['product_description'];
+            $product->time=$product_details['time'];
             $product->sub_unit_ids = !empty($product_details['sub_unit_ids']) ? $product_details['sub_unit_ids'] : null;
             $product->warranty_id = !empty($request->input('warranty_id')) ? $request->input('warranty_id') : null;
 

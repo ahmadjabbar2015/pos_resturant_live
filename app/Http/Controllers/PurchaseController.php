@@ -875,6 +875,11 @@ class PurchaseController extends Controller
             $query = Contact::where('business_id', $business_id)
                             ->active();
 
+            $selected_contacts = User::isSelectedContacts($user_id);
+            if ($selected_contacts) {
+                $query->join('user_contact_access AS uca', 'contacts.id', 'uca.contact_id')
+                ->where('uca.user_id', $user_id);
+            }
             $suppliers = $query->where(function ($query) use ($term) {
                 $query->where('name', 'like', '%' . $term .'%')
                                 ->orWhere('supplier_business_name', 'like', '%' . $term .'%')

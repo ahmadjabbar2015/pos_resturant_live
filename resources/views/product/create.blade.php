@@ -11,6 +11,8 @@
         <li class="active">Here</li>
     </ol> -->
 </section>
+{{-- time link --}}
+<link href="https://cdn.jsdelivr.net/timepicker.js/latest/timepicker.min.css" rel="stylesheet"/>
 
 <!-- Main content -->
 <section class="content">
@@ -73,6 +75,13 @@
                 <button type="button" @if(!auth()->user()->can('brand.create')) disabled @endif class="btn btn-default bg-white btn-flat btn-modal" data-href="{{action('BrandController@create', ['quick_add' => true])}}" title="@lang('brand.add_brand')" data-container=".view_modal"><i class="fa fa-plus-circle text-primary fa-lg"></i></button>
               </span>
             </div>
+          </div>
+        </div>
+{{-- //timer  --}}
+        <div class="col-sm-4">
+          <div class="form-group">
+            {!! Form::label('time', __('Cooked Time') . ':') !!}
+              {!! Form::text('time',   null, ['class' => 'form-control', 'id'=>'time']); !!}
           </div>
         </div>
 
@@ -353,6 +362,24 @@
   </div>
 {!! Form::close() !!}
   
+
+{{-- java script for timer --}}
+<script src="https://cdn.jsdelivr.net/timepicker.js/latest/timepicker.min.js"></script>
+<script>
+  var timepicker = new TimePicker('time', {
+  lang: 'en',
+  theme: 'dark'
+});
+timepicker.on('change', function(evt) {
+  
+  // var value = evt.minute || '00' ;
+  // evt.element.value = value;
+  var value = (evt.hour || '00') + ':' + (evt.minute || '00') ;
+  evt.element.value = value;
+
+
+});
+</script>
 </section>
 <!-- /.content -->
 
