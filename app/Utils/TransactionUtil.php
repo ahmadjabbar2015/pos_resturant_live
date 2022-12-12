@@ -151,7 +151,7 @@ class TransactionUtil extends Util
     public function updateSellTransaction($transaction_id, $business_id, $input, $invoice_total, $user_id, $uf_data = true, $change_invoice_number = true)
     {
         $transaction = $transaction_id;
-
+        dd($invoice_total);
         if (!is_object($transaction)) {
             $transaction = Transaction::where('id', $transaction_id)
                         ->where('business_id', $business_id)
@@ -164,6 +164,7 @@ class TransactionUtil extends Util
             $invoice_scheme_id = !empty($input['invoice_scheme_id']) ? $input['invoice_scheme_id'] : null;
             $invoice_no = $this->getInvoiceNumber($business_id, $input['status'], $transaction->location_id, $invoice_scheme_id);
         }
+        dd($input);
         $final_total = $uf_data ? $this->num_uf($input['final_total']) : $input['final_total'];
         $update_date = [
             'status' => $input['status'],

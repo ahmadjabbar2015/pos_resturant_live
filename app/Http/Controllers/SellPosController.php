@@ -663,8 +663,10 @@ class SellPosController extends Controller
                 }
                
                 if ($print_invoice) {
+                   
                                       
                     $receipt = $this->receiptContent($business_id, $input['location_id'], $transaction->id, null, false, true, $invoice_layout_id);
+                   
                 }
 
                 $output = ['success' => 1, 'msg' => $msg, 'receipt' => $receipt ];
@@ -792,11 +794,16 @@ class SellPosController extends Controller
             $output['print_type'] = 'printer';
             $output['printer_config'] = $this->businessUtil->printerConfig($business_id, $location_details->printer_id);
             $output['data'] = $receipt_details;
+            
         } else {
+            
             $layout = !empty($receipt_details->design) ? 'sale_pos.receipts.' . $receipt_details->design : 'sale_pos.receipts.classic';
 
             $output['html_content'] = view($layout, compact('receipt_details'))->render();
+          
+            
         }
+      
         
         return $output;
     }
@@ -2665,6 +2672,7 @@ class SellPosController extends Controller
      */
     public function convertToInvoice($id)
     {
+        
         if (!auth()->user()->can('sell.create') && !auth()->user()->can('direct_sell.access')) {
             abort(403, 'Unauthorized action.');
         }

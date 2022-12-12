@@ -503,13 +503,13 @@ class ProductUtil extends Util
         //         $details['quantity']
         //     );
         // }
-        // dd("haha");
+        
         $alll=DB::table('mfg_recipes')->where('variation_id',$varid)->first();
         
         $qan=$qut;
         
         foreach ($intergirdent as  $value) {
-            // dd($value);
+            
                     
                     $qant_upadtae=$value->quantity * $qan;
                     

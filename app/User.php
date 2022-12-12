@@ -99,13 +99,13 @@ class User extends Authenticatable
      * @return string or array
      */
     public function permitted_locations($business_id = null)
-    {
+    {   
         $user = $this;
-
         if ($user->can('access_all_locations')) {
             return 'all';
         } else {
-            $business_id = !is_null($business_id) ? $business_id : request()->session()->get('user.business_id');
+            // $business_id = !is_null($business_id) ? $business_id : request()->session()->get('user.business_id');
+            $business_id = !is_null($business_id) ? $business_id : $user->business_id;
             $permitted_locations = [];
             $all_locations = BusinessLocation::where('business_id', $business_id)->get();
             foreach ($all_locations as $location) {
@@ -124,16 +124,16 @@ class User extends Authenticatable
      * @return boolean
      */
     public static function can_access_this_location($location_id, $business_id = null)
-    {
+    {        
         $permitted_locations = auth()->user()->permitted_locations($business_id);
         
         if ($permitted_locations == 'all' || in_array($location_id, $permitted_locations)) {
             return true;
         }
+        dd($permitted_locations);
 
         return false;
     }
-
     public function scopeOnlyPermittedLocations($query)
     {
         $user = auth()->user();
